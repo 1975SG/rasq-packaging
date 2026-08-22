@@ -261,6 +261,27 @@ These are today's local build artifacts, not a tagged release -- the
 manifest needs regenerating for whatever actually ships, the hashes
 here don't carry forward to a different build.
 
+## SBOM + dependency license audit: done for real (2026-08-22)
+
+Two real artifacts, `release/iderm.cdx.json` (a real CycloneDX 1.5
+SBOM, 343 components, `cargo cyclonedx --describe binaries
+--spec-version 1.5`) and `release/dependency-licenses.txt` (a real
+`cargo license` run, the tool `docs/manual/10_License.md` Clause 10.4
+already recommended but nobody had actually run before now). Full
+findings, including which listed licenses apply to the real compiled
+binary and which don't, are in `release/SBOM-AND-LICENSE-AUDIT.md` --
+short version: `nvim-rs`'s LGPL-3.0 is the already-documented
+exception, `ittapi`'s `BSD-3-Clause OR GPL-2.0` is compliant via the
+BSD-3-Clause option (already allowed), and `terminfo`'s WTFPL isn't
+actually in the shipped binary at all -- confirmed via `cargo tree`
+directly, not assumed, since both tools scan the full `Cargo.lock`
+resolution rather than the actual feature-active dependency graph.
+Real leak caught and fixed in the SBOM itself before committing: the
+root component's `bom-ref` embedded the real local build machine's
+home directory path (`path+file:///home/SG/dev/iderm`), a `cargo-
+cyclonedx` default for path-based root packages -- rewritten to a
+generic path in both places it appeared, kept internally consistent.
+
 ## What's still missing before any of this is real
 
 - **DEB signing** -- real caveat and scripts ready in `signing/`,

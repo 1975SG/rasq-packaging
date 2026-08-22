@@ -42,6 +42,14 @@ cargo license
 ```
 
 The command is an operator aid. Its output shall be reviewed before release.
+Run for real 2026-08-22, output reviewed: `release/dependency-licenses.txt`.
+A real CycloneDX 1.5 software bill of materials
+(`cargo cyclonedx --describe binaries --spec-version 1.5`) was generated the
+same day: `release/iderm.cdx.json`. Both list every package `Cargo.lock`
+resolves, which is broader than what is actually compiled into the binary --
+`release/SBOM-AND-LICENSE-AUDIT.md` states which findings from the broader
+listing apply to the real build and which do not, checked against
+`cargo tree` directly rather than assumed.
 
 One dependency, `nvim-rs` (the embedded-Neovim RPC client Clause 2.3's editor
 handover uses), is licensed LGPL-3.0, a documented exception to an otherwise
