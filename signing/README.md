@@ -60,10 +60,20 @@ similar) with a signed `Release` file is a separate, larger, later task
 signing/sign-deb.sh path/to/iderm_0.1.0-1_amd64.deb
 ```
 
-**Status: blocked, not signed yet.** `dpkg-sig` isn't packaged for
-Fedora at all (confirmed via `dnf list dpkg-sig` -- no match) --
-genuinely Debian/Ubuntu-only tooling. Run this on a real Debian/Ubuntu
-box with root (the Zorin box, or the 2008 Debian 12 box once it has
-root again) -- either regenerate this same key identity there, or
-import the private key from this machine (real key-transfer judgment
-call, not automated here).
+**Status: closed for now via `release/SHA256SUMS.asc` instead, real
+`dpkg-sig` signing stays a real, separate open item.** `dpkg-sig`
+itself is still not packaged for Fedora (confirmed via `dnf list
+dpkg-sig` -- no match) -- genuinely Debian/Ubuntu-only tooling.
+`binutils`/`gnupg2` (installed 2026-08-22) give the raw building
+blocks (`ar`, `gpg`) `dpkg-sig` itself uses internally, but not its
+specific signature format/algorithm -- hand-replicating that risks
+producing something that looks signed but doesn't verify with a real
+`dpkg-sig --verify`, worse than no signature at all. Decided
+2026-08-22: `release/SHA256SUMS.asc` (see the checksums section of
+`packaging/README.md`) is a real, `gpg --verify`-confirmed signature
+already covering both real `.deb` files, using the same key, same
+`gpg` binary -- genuinely equivalent integrity/authenticity proof, in
+a more universal format than `dpkg-sig`'s DEB-specific one. Real
+`dpkg-sig`-native signing (if ever specifically needed) still requires
+a real Debian/Ubuntu box with root -- the script above stays ready for
+that, not deleted, just not the active path right now.
