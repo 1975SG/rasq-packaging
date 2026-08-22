@@ -241,11 +241,12 @@ full dependency tree (~390 crates). Real findings, not hoped-for ones:
 
 ## What's still missing before any of this is real
 
-- RPM/DEB package **signing** -- real GPG key generated 2026-08-22 (RSA
-  4096, sign-only), public key + scripts + honest status in
-  `signing/`. Actual signing blocked on tooling, not the key: `rpm-sign`
-  needs real root this session doesn't have on this machine; `dpkg-sig`
-  isn't packaged for Fedora at all, needs a real Debian/Ubuntu box.
+- **DEB signing** -- real caveat and scripts ready in `signing/`,
+  blocked on `dpkg-sig` not being packaged for Fedora; needs a real
+  Debian/Ubuntu box. **RPM signing is done for real, 2026-08-22** --
+  both local RPMs signed and `rpm -Kv`-verified against the real key
+  fingerprint (`20331e9f...`), see `signing/README.md`. Signing a real
+  build from the P1 RHEL box is the one remaining RPM-signing step.
 - macOS code signing + notarization -- deliberately deferred until real
   demand justifies the Apple Developer reactivation, same as the manual's
   own collaboration-condition wording.

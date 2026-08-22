@@ -23,14 +23,25 @@ meaningful for a standalone downloaded `.rpm`, not just a hosted repo.
 signing/sign-rpm.sh path/to/iderm-0.1.0-1.*.rpm
 ```
 
-**Status: blocked, not signed yet.** Needs the `rpm-sign` package
-(provides `rpm --addsign`; the base `rpm` package this dev machine has
-only supports signature *verification*, confirmed via
-`rpm --help | grep sign`) -- requires real root, which this session
-doesn't have an interactive terminal for. Run
-`sudo dnf install -y rpm-sign` from a real terminal (or wherever real
-root is available, e.g. the P1 RHEL box the real RPM build was already
-verified on), then run the script above.
+**Status: done for real, 2026-08-22.** `rpm-sign` and the system
+keyring import both needed real root -- installed and run from a real
+terminal (`sudo dnf install -y rpm-sign`, `sudo rpm --import
+signing/iderm-release-key.asc`), not scriptable from this session.
+Both local RPMs (`iderm-0.1.0-1.fc43.x86_64.rpm`,
+`iderm-plugins-bundled-0.1.0-1.fc43.noarch.rpm`) signed and verified:
+
+```
+$ rpm -Kv iderm-0.1.0-1.fc43.x86_64.rpm
+    Header OpenPGP V4 RSA/SHA512 signature, key fingerprint: 20331e9f5dc14d2f5a6b67eccfa7a6db35cd8203: OK
+    Header SHA256 digest: OK
+    Payload SHA256 digest: OK
+```
+
+Correct key fingerprint, both digests OK, on both packages. The RPM
+built and verified on the real P1 RHEL box earlier is a separate
+artifact from these local ones -- signing a fresh real build there
+(same `rpm-sign` + import steps) is the one remaining step before a
+real signed release RPM exists end to end.
 
 ## DEB
 
