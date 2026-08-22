@@ -239,6 +239,28 @@ full dependency tree (~390 crates). Real findings, not hoped-for ones:
   keep for whatever adds it next).
 - **Result: `advisories ok, bans ok, licenses ok, sources ok`, exit 0.**
 
+## SHA-256 checksums + release manifest: done for real (2026-08-22)
+
+`signing/generate-manifest.sh` computes real SHA-256 hashes for every
+built artifact and writes `release/SHA256SUMS` (the plain
+`sha256sum -c` format) and `release/RELEASE-MANIFEST.md` (a readable
+table with size). Run against today's 5 real local artifacts (2 DEB,
+2 RPM, 1 AppImage) -- verified end to end with a real
+`sha256sum -c SHA256SUMS`, all 5 report `OK`, not just generated and
+trusted.
+
+`release/SHA256SUMS.asc` is a real, verified detached GPG signature
+over `SHA256SUMS` (`gpg --verify` confirms "Good signature"), signed
+with the same key from the RPM signing pass above. One signature
+covers all five artifacts regardless of package format -- meaningfully
+closes part of the DEB integrity gap too, since `apt`/`dpkg` never
+check a standalone `.deb`'s own signature but a signed checksum
+manifest is real, checkable proof either way.
+
+These are today's local build artifacts, not a tagged release -- the
+manifest needs regenerating for whatever actually ships, the hashes
+here don't carry forward to a different build.
+
 ## What's still missing before any of this is real
 
 - **DEB signing** -- real caveat and scripts ready in `signing/`,
@@ -250,8 +272,6 @@ full dependency tree (~390 crates). Real findings, not hoped-for ones:
 - macOS code signing + notarization -- deliberately deferred until real
   demand justifies the Apple Developer reactivation, same as the manual's
   own collaboration-condition wording.
-- SHA-256 checksums + a release manifest for whatever gets actually
-  published.
 - A real tagged release to build the Homebrew formula's `url`/`sha256`
   against -- `head` install only works from a live git checkout, not a
   distributable artifact.
