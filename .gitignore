@@ -1,0 +1,3 @@
+target/
+packaging/deb-build-output/
+packaging/appimage-build-output/

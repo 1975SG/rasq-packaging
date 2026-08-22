@@ -1,0 +1,321 @@
+.TH IDERM 1 "2026-08-16" "IDERM 0.1.0" "User Commands"
+.SH NAME
+iderm \- project intelligence in your terminal
+.SH SYNOPSIS
+.B iderm
+.RI [ path ]
+.br
+.B iderm scan --format=json
+.RI [ path ]
+.br
+.B iderm doctor --json
+.RI [ path ]
+.br
+.B iderm ledger record
+.RI [ path ]
+.RI [ "--note " text ]
+.br
+.B iderm ledger diff
+.RI [ path ]
+.br
+.B iderm ledger --json
+.RI [ path ]
+.br
+.B iderm graph
+.RB < --dot | --mermaid >
+.RI [ path ]
+.br
+.B iderm ai repair
+.RI [ path ]
+.RI [ --apply ]
+.br
+.B iderm ai explain
+.RI [ path ]
+.br
+.B iderm ai test
+.RI [ path ]
+.br
+.B iderm trust
+.RI [ path ]
+.br
+.B iderm --version
+.RB | " -V"
+.SH DESCRIPTION
+.B iderm
+scans a project, runs Doctor checks, and opens a terminal workspace.
+It can also expose the same project model through headless commands.
+.PP
+The default
+.I path
+is the current directory.
+Startup performs local scanning and Doctor evaluation. Core does not require
+network access.
+.SH HEADLESS COMMANDS
+.TP
+.B scan --format=json
+Print detected manifests, language data, and compile database entries in a
+versioned JSON envelope. This command does not write project state.
+.TP
+.B doctor --json
+Print built-in and project-local Doctor findings in a versioned JSON envelope.
+This command does not write project state.
+.TP
+.B ledger record
+Scan the project and append one record to
+.IR .iderm/run-ledger.jsonl .
+The optional
+.B --note
+value is stored as unparsed text.
+.TP
+.B ledger diff
+Print a structural JSON diff of the two newest ledger entries. At least two
+entries are required.
+.TP
+.B ledger --json
+Print all ledger entries in recording order. A missing ledger produces an
+empty list.
+.TP
+.B graph --dot
+Print the build graph as DOT text.
+.TP
+.B graph --mermaid
+Print the build graph as Mermaid text.
+Graph data is derived from a real
+.IR compile_commands.json .
+No compile database produces empty output.
+.TP
+.B ai repair
+Send project and Doctor state to the external command declared by
+.IR .iderm/ai.toml .
+Without
+.BR --apply ,
+print proposals only. With
+.BR --apply ,
+create accepted new files after path validation.
+.TP
+.B ai explain
+Request an external explanation of Doctor findings.
+.TP
+.B ai test
+Run the one derived task whose label contains
+.B test
+and pass its output to the configured external command. Refuses and names
+every candidate if more than one task matches.
+.TP
+.B trust
+Review and approve every declared, gate-covered file the project currently
+has --
+.IR .iderm/ai.toml ,
+.IR .iderm/tasks.toml ,
+any auto-discovered
+.I stream_*
+script, and any project-local
+.IR .iderm/languages/*.toml
+-- prompting once per file. The explicit, non-interactive-safe way
+to establish trust ahead of a scripted or CI run. See
+.BR iderm-security (7).
+.TP
+.B --version, -V
+Print the version and exit.
+.SH TREE KEYS
+.TP
+.BR Up , " Down" , " j" , " k"
+Move selection.
+.TP
+.BR PageUp , PageDown
+Scroll Doctor findings.
+.TP
+.BR Home , End
+Select the first or last tree item.
+.TP
+.B /
+Search tree text.
+.TP
+.B Enter
+Open the selected file in Neovim.
+.TP
+.B s
+Suspend the workspace and start
+.BR $SHELL .
+.TP
+.B r
+Open Repair. Use
+.B y
+to apply,
+.B n
+to skip, or
+.B Esc
+to cancel.
+.TP
+.B b
+Toggle build tree.
+.TP
+.B g
+Toggle Git status.
+.TP
+.B x
+Toggle task list.
+.TP
+.B o
+Open the Rust outline.
+.TP
+.B p
+Preview Markdown.
+.TP
+.B v
+View SVG.
+.TP
+.B i
+Inspect JSON or YAML.
+.TP
+.B w
+Open the workbench picker.
+.TP
+.B l
+Start an LSP handshake in the background.
+.TP
+.B t
+Toggle dense and CRT themes.
+.TP
+.BR q , Esc
+Close the active panel, or exit from the tree.
+.SH WORKBENCH KEYS
+.TP
+.B F5
+Toggle live refresh. Alternative:
+.BR Ctrl+l .
+.TP
+.BR F6 , F7
+Decrease or increase refresh interval. Alternatives:
+.B Ctrl+,
+and
+.BR Ctrl+. .
+.TP
+.B F8
+Add a pane. Alternative:
+.BR Ctrl+a .
+Up to four panes are supported.
+.TP
+.B F9
+Export the focused XY chart as SVG and TikZ. Alternative:
+.BR Ctrl+e .
+.TP
+.B Insert
+Snapshot the focused table. Alternative:
+.BR Ctrl+i .
+.TP
+.B Shift+F5
+Toggle live refresh for all panes. Alternative:
+.BR Ctrl+Shift+l .
+.TP
+.BR Shift+F6 , Shift+F7
+Decrease or increase refresh interval for all panes. Alternatives:
+.B Ctrl+Shift+,
+and
+.BR Ctrl+Shift+. .
+.TP
+.B Shift+F10
+Snapshot all tables. Alternative:
+.BR Ctrl+Shift+i .
+.TP
+.B Tab
+Select the next pane.
+.TP
+.B Esc
+Close the workbench.
+.PP
+The workbench accepts free text. Therefore
+.B q
+is input, not a close key.
+.SH TASKS
+One-shot tasks receive terminal handover and run to completion.
+Continuous tasks run in the background. Selecting the same continuous task
+again stops it. IDERM stops remaining continuous children on exit.
+.PP
+Root files named
+.BI stream_ name .py
+or
+.BI stream_ name .sh
+are discovered as continuous tasks. The output argument is
+.IB name .analog-capture .
+.SH FILES
+.TP
+.I .iderm/
+Project-local configuration and generated state.
+.TP
+.I .iderm/run-ledger.jsonl
+Append-only Run Ledger.
+.TP
+.I .iderm/exports/
+SVG and TikZ figure exports.
+.TP
+.I logs/
+Continuous-task logs.
+.PP
+See
+.BR iderm-config (5)
+for the complete layout.
+.SH ENVIRONMENT
+.TP
+.B SHELL
+Shell started by the
+.B s
+action. If unset, IDERM uses
+.IR /bin/sh .
+.TP
+.B PATH
+Used to locate Git, Neovim, language servers, task programs, and the configured
+AI command.
+.SH EXIT STATUS
+.TP
+.B 0
+Command completed successfully.
+.TP
+.B 1
+A recognized command failed, required input was invalid, or no interactive
+terminal was available for TUI startup.
+.SH SECURITY
+Project plugins are sandboxed WASM components. Project tasks, Git, Neovim,
+language servers, shells, and AI commands are native processes with the user's
+permissions.
+.PP
+Inspect an unfamiliar project's
+.I .iderm/
+directory, build manifests, and
+.B stream_*
+scripts before executing project actions.
+See
+.BR iderm-security (7).
+.SH NOTES
+IDERM requires no login, cloud workspace, or animated assistant. If startup
+enters a loop and produces 80 decibels, verify that you did not install an old
+Cisco router by mistake.
+.PP
+Mouse input is additive. The keyboard remains fully supported. Darwin may
+reconsider evolution after observing certain touch interfaces.
+.PP
+On some laptop keyboards
+.B PageUp
+and
+.B PageDown
+exist only as
+.B fn+Up
+and
+.BR fn+Down ,
+and some terminal applications do not translate that combination into the
+expected escape sequence, so Doctor-panel scrolling has no effect. This case
+has no in-app fallback chord; remap
+.B fn+Up
+/
+.B fn+Down
+to send real
+.B Page Up
+/
+.B Page Down
+at the operating-system or terminal level.
+.SH SEE ALSO
+.BR iderm-config (5),
+.BR iderm-plugin (7),
+.BR iderm-security (7),
+.BR git (1),
+.BR nvim (1)

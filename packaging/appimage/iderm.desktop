@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=IDERM
+GenericName=Terminal-first project IDE
+Comment=Terminal-first, project-aware IDE
+Exec=iderm
+Icon=iderm
+Categories=Development;Utility;
+Terminal=true
