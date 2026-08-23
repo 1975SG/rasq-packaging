@@ -32,7 +32,7 @@
 
 Name:           iderm
 Version:        0.1.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Terminal-first, project-aware IDE
 
 License:        MIT OR Apache-2.0
@@ -86,15 +86,28 @@ done
 
 %files
 %{_bindir}/iderm
+%dir %{_docdir}/%{name}
 %doc %{_docdir}/%{name}/README.md
 %{_mandir}/man1/iderm.1*
+%dir %{_licensedir}/%{name}
 %license %{_licensedir}/%{name}/LICENSE-MIT
 %license %{_licensedir}/%{name}/LICENSE-APACHE
 
 %files plugins-bundled
+%dir %{_datadir}/iderm
+%dir %{_datadir}/iderm/plugins
 %{_datadir}/iderm/plugins/*.wasm
 
 %changelog
+* Sun Aug 23 2026 Sinan Gözel <sinan.gozel@gmail.com> - 0.1.0-3
+- Real finding from a real rpm -U/-e update+removal test (P1's RHEL
+  10.2 successor box): install -D to an absolute path plus a
+  %doc/%license reference to that same absolute path does not give
+  RPM ownership of the containing directory the way the bare-filename
+  %doc/%license shorthand does. rpm -e left three empty directories
+  behind (%{_docdir}/%{name}, %{_licensedir}/%{name},
+  %{_datadir}/iderm and its plugins/ subdirectory). Fixed with
+  explicit %dir entries for all three.
 * Sun Aug 23 2026 Sinan Gözel <sinan.gozel@gmail.com> - 0.1.0-2
 - Release bump only, no source/functional change. Exists to give
   rpm -U a real, different package to upgrade over 0.1.0-1 with, so
