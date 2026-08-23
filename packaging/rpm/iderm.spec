@@ -32,7 +32,7 @@
 
 Name:           iderm
 Version:        0.1.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Terminal-first, project-aware IDE
 
 License:        MIT OR Apache-2.0
@@ -95,6 +95,10 @@ done
 %{_datadir}/iderm/plugins/*.wasm
 
 %changelog
+* Sun Aug 23 2026 Sinan Gözel <sinan.gozel@gmail.com> - 0.1.0-2
+- Release bump only, no source/functional change. Exists to give
+  rpm -U a real, different package to upgrade over 0.1.0-1 with, so
+  the update path (not just fresh install) gets genuinely tested.
 * Fri Aug 21 2026 Sinan Gözel <sinan.gozel@gmail.com> - 0.1.0-1
 - Placeholder spec, not yet built or signed. Added the plugins-bundled
   subpackage (6-plugin curated set).
