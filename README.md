@@ -1,5 +1,9 @@
 # iderm-packaging
 
+**[Live demo and landing page &rarr;](https://1975sg.github.io/iderm-packaging/)**
+
+[![iderm: project tree, Doctor, outline, docs, tasks, editor, and live workbenches in one terminal](https://1975sg.github.io/iderm-packaging/hero.png)](https://1975sg.github.io/iderm-packaging/)
+
 Packaging and documentation for [IDERM](https://github.com/1975SG) --
 **I**ntegrated **D**evelopment, **E**ngineering & **R**esearch **M**anager, a
 terminal-first, project-aware IDE.
