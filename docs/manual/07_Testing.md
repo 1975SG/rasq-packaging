@@ -4,7 +4,7 @@
 |---|---|
 | Document type | User manual, Clause 7 |
 | Part of | [Index](index.md) |
-| Record date | 2026-08-16 |
+| Record date | 2026-08-23 |
 
 ## 7.1 Status
 
@@ -67,12 +67,42 @@ Tests cover:
 The malicious repair test attempted a path outside the project root. Core
 refused the proposal and did not create the target file.
 
-## 7.6 Acceptance record placeholders
+## 7.6 Acceptance record
 
-Before public packaging, add dated evidence for:
-
-- [PLACEHOLDER: clean RPM install, run, update, and removal]
-- [PLACEHOLDER: clean Homebrew install, run, update, and removal]
-- [PLACEHOLDER: signed artifact and checksum verification]
-- [PLACEHOLDER: current third-party dependency license report]
-- [PLACEHOLDER: independent security review, if commissioned]
+- **RPM install and run, 2026-08-22.** A real `.rpm` installed via
+  `sudo rpm -i` on a clean RHEL box; the installed binary ran against
+  a real project with real USB hardware attached. Record:
+  `packaging/README.md`, RPM section. **Update and removal are not yet
+  recorded** -- `rpm -U`/`rpm -e` against a prior install have not been
+  exercised. Remains open.
+- **Homebrew install and run, 2026-08-22.** A real
+  `brew install --build-from-source --HEAD` on a clean macOS box; the
+  installed binary ran a self-scan against its own repository and a
+  real multi-pane live-hardware-capture session. Record:
+  `packaging/README.md`, Homebrew section. **Update and removal are
+  not yet recorded** -- `brew upgrade`/`brew uninstall` have not been
+  exercised. Remains open.
+- **Signed artifact and checksum verification, 2026-08-22.** A real
+  GPG key (RSA 4096, fingerprint
+  `20331E9F5DC14D2F5A6B67ECCFA7A6DB35CD8203`) signed both local RPM
+  artifacts; `rpm -Kv` confirmed a good signature and matching header
+  and payload digests on both. `release/SHA256SUMS` covers five real
+  local artifacts (2 DEB, 2 RPM, 1 AppImage); `sha256sum -c` confirmed
+  all five. `release/SHA256SUMS.asc`, a detached signature over that
+  file with the same key, verified with `gpg --verify`. Record:
+  `signing/README.md`, `release/RELEASE-MANIFEST.md`.
+- **Current third-party dependency license report, 2026-08-22.** A
+  real `cargo license` run (`release/dependency-licenses.txt`) and a
+  real CycloneDX 1.5 software bill of materials, 343 components
+  (`release/iderm.cdx.json`, via `cargo cyclonedx`). Findings checked
+  against the actual compiled binary, not only the broader dependency
+  graph both tools scan by default. Record:
+  `release/SBOM-AND-LICENSE-AUDIT.md`.
+- **Independent security review, 2026-08-10.** A manual OWASP-class
+  source review plus `cargo audit` (387 dependencies at the time) plus
+  empirical proof-of-concept reproduction, commissioned and completed.
+  One real, exploitable sandbox-boundary finding (a path-traversal
+  escape in a host-facing plugin function), fixed the same day; two
+  Low findings, addressed. Zero hand-written `unsafe` code in scope;
+  zero dependency CVEs. Record: `docs/reference/Security_Reports_Compact.md`
+  (full report in Core's own repository).
