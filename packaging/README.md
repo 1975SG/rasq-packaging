@@ -147,13 +147,29 @@ note above.)
   `release/SHA256SUMS`, `RELEASE-MANIFEST.md`, and `SHA256SUMS.asc`
   regenerated and re-signed to match the rebuilt, clean `.deb`s' new
   bytes.
-- **`no-manual-page`**, real and open. No `man` page ships for `iderm`.
-  Minor, cosmetic gap; not blocking for a non-archive package.
+- **`no-manual-page`, fixed for real, same day.** `docs/man/iderm.1`
+  (Core's hand-written man page, already used by the RPM spec) was
+  simply never listed in `cargo-deb`'s `assets` -- added as
+  `["docs/man/iderm.1", "usr/share/man/man1/iderm.1", "644"]` to both
+  the base and `plugins-bundled` variant. `cargo-deb` auto-gzipped it
+  on build (confirmed via `dpkg-deb -c`, real behavior, not assumed
+  from docs) -- no manual compression step needed. Rebuilt both `.deb`
+  variants for real (`cargo build --release` with the same
+  `RUSTFLAGS`/`CFLAGS` remap flags applied from the start this time,
+  4m17s; `cargo deb --no-build`, both variants) and re-ran `lintian`:
+  `no-manual-page` is gone on both packages. Extracted and rendered
+  the packaged `iderm.1.gz` with real `man --local-file` to confirm it
+  actually displays correctly, not just that the file exists.
+  Independently re-verified zero leaks on this machine before
+  shipping (same discipline as the `no-changelog` fix above).
+  `release/SHA256SUMS`, `RELEASE-MANIFEST.md`, and `SHA256SUMS.asc`
+  regenerated and re-signed again to match.
 
 Scratch copies (`~/iderm_0.1.0-1_amd64.deb`,
 `~/iderm-plugins-bundled_0.1.0-1_amd64.deb`,
-`~/iderm-changelog-test/`) removed from the box
-afterward, nothing left there.
+`~/iderm-changelog-test/`, `~/iderm-manpage-test/`,
+`~/manpage-check/`) removed from the box afterward, nothing left
+there.
 
 ## RPM: verified for real (2026-08-22)
 
@@ -367,11 +383,6 @@ generic path in both places it appeared, kept internally consistent.
 - A real tagged release to build the Homebrew formula's `url`/`sha256`
   against -- `head` install only works from a live git checkout, not a
   distributable artifact.
-- `lintian`'s one remaining real open finding: no `man` page for
-  `iderm`'s DEB packaging (the `no-changelog` finding is fixed, see
-  the "Lintian: done for real" section above). `rpmlint` and `lintian`
-  are both done as tools -- this is packaging content, not a blocked
-  check.
 - AppImage's bundled-plugins variant (see above).
 - A final icon set from a real designer -- the current icon is the
   user's real logo (see above), not a generated placeholder anymore,

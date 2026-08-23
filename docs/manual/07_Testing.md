@@ -96,11 +96,18 @@ refused the proposal and did not create the target file.
   installed and run against both real `.deb`s. Three real findings:
   `embedded-library libyaml` (a c2rust transliteration, not a true
   vendored C library -- understood, not actionable), `no-changelog`,
-  and `no-manual-page`. `no-changelog` fixed the same day: added a
-  real `debian/changelog` to Core, rebuilt both `.deb`s on the same
-  box, re-ran `lintian` -- the finding is gone. `no-manual-page`
-  remains open. Record: `packaging/README.md`, "Lintian: done for
-  real" section.
+  and `no-manual-page`. Both fixed the same day: a real
+  `debian/changelog` in Core closed `no-changelog`; adding Core's
+  existing `docs/man/iderm.1` to `cargo-deb`'s asset list (it was
+  already used by the RPM spec, just never wired into DEB) closed
+  `no-manual-page` -- `cargo-deb` auto-gzips it, confirmed real. Both
+  `.deb`s rebuilt and re-linted after each fix; only the understood
+  `embedded-library` finding remains. A first rebuild pass also
+  leaked the build machine's real home directory path into the
+  binary (`RUSTFLAGS`'s remap doesn't cover `tree-sitter`'s bundled C
+  sources) -- caught with `strings` before shipping, fixed with
+  `RUSTFLAGS`+`CFLAGS` together, independently re-verified clean.
+  Record: `packaging/README.md`, "Lintian: done for real" section.
 - **Current third-party dependency license report, 2026-08-22.** A
   real `cargo license` run (`release/dependency-licenses.txt`) and a
   real CycloneDX 1.5 software bill of materials, 343 components
