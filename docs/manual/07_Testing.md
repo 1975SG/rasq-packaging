@@ -99,9 +99,23 @@ refused the proposal and did not create the target file.
   `brew install --build-from-source --HEAD` on a clean macOS box; the
   installed binary ran a self-scan against its own repository and a
   real multi-pane live-hardware-capture session. Record:
-  `packaging/README.md`, Homebrew section. **Update and removal are
-  not yet recorded** -- `brew upgrade`/`brew uninstall` have not been
-  exercised. Remains open.
+  `packaging/README.md`, Homebrew section.
+- **Homebrew update and removal, 2026-08-23.** The tap's local source
+  repo was synced to the current project state and committed, moving
+  `head`'s git ref forward with real new content. `brew upgrade`
+  alone reported "already installed" without rebuilding -- a real
+  finding, not the expected update path for a `--HEAD` formula.
+  `brew reinstall` (the exact command Homebrew's own `--force` error
+  message pointed at) correctly rebuilt from the new `head`, 5
+  minutes, confirmed via `iderm --version` afterward. `brew uninstall`
+  removed `iderm` cleanly -- confirmed via `brew list`, `which iderm`,
+  and the Cellar/bin paths all reporting gone -- and also autoremoved
+  13 now-unused build-time dependencies pulled in only for `iderm`,
+  including the whole Rust toolchain (~2GB freed): real, expected
+  Homebrew `autoremove` behavior, not a packaging bug. Two harmless
+  warnings about leftover shared `openssl@3`/`ca-certificates` config
+  files, unrelated to `iderm`'s own files. Record: `packaging/README.md`,
+  Homebrew section.
 - **Signed artifact and checksum verification, 2026-08-22.** A real
   GPG key (RSA 4096, fingerprint
   `20331E9F5DC14D2F5A6B67ECCFA7A6DB35CD8203`) signed both local RPM

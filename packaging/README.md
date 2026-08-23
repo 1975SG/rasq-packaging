@@ -286,6 +286,40 @@ correct; only the test instructions for a from-source `head` install were
 wrong -- `HOMEBREW-TEST-README.md` still needs that section rewritten to
 match the real procedure.
 
+## Homebrew update + removal: verified for real (2026-08-23)
+
+Same real i9 MacBook Pro, same local tap. The tap's source repo
+(`/Users/Shared/iderm` behind `file://`) hadn't been touched since the
+original install-only pass weeks earlier -- synced it to the current
+project state and committed locally (no `origin` remote on this
+standalone tap repo, so a direct rsync + commit, not a `git pull`),
+moving `head`'s git ref forward with real new content (441 files
+changed against the stale snapshot).
+
+- **Real finding: `brew upgrade` alone does not rebuild a `--HEAD`
+  formula from a moved `head` ref.** Ran `brew upgrade
+  --build-from-source <tap>/iderm/iderm` against the advanced HEAD --
+  reported "HEAD already installed", no rebuild. Also tried
+  `brew install --HEAD --force`, which Homebrew itself rejected with a
+  pointer to the actual correct command.
+- **Real update test, correct command**: `brew reinstall
+  --build-from-source iderm`. Real rebuild, 5 minutes, `🍺
+  .../Cellar/iderm/HEAD: 10 files, 33.4MB` (10 files vs. the original
+  install's 9 -- real evidence the new `debian/changelog` from
+  today's earlier DEB work in Core actually got built in, not just a
+  cached reuse). `iderm --version` confirmed correct afterward.
+- **Real removal test**: `brew uninstall iderm` removed cleanly --
+  confirmed via `brew list --versions iderm`, `which iderm`, and the
+  Cellar/`bin` paths all reporting gone afterward, not just trusting
+  the uninstall command's own success message. Also autoremoved 13
+  now-unused build-time dependencies pulled in only for `iderm`,
+  including the whole Rust toolchain (~2GB freed) -- real, expected
+  Homebrew `autoremove` behavior, not an `iderm` packaging issue. Two
+  harmless warnings about leftover shared `openssl@3`/
+  `ca-certificates` config files (Homebrew's own convention for
+  configs a user might have customized -- not `iderm`'s files, not
+  cleaned up by any formula's uninstall).
+
 ## AppImage: verified for real (2026-08-22)
 
 Built and tested on this dev machine (Fedora, x86_64), not assumed:
