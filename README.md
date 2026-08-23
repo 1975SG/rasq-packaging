@@ -17,6 +17,22 @@ using these methods during exploratory and study phases. It does not
 replace the methods or their specialist tools, it just gets them out of
 the way of the project you're actually working on.
 
+## Download
+
+**[v0.1.0 →](https://github.com/1975SG/iderm-packaging/releases/tag/v0.1.0)** -- first tagged release, real builds, real installs verified on real hardware.
+
+- [`iderm_0.1.0-1_amd64.deb`](https://github.com/1975SG/iderm-packaging/releases/download/v0.1.0/iderm_0.1.0-1_amd64.deb) / [`iderm-plugins-bundled_0.1.0-1_amd64.deb`](https://github.com/1975SG/iderm-packaging/releases/download/v0.1.0/iderm-plugins-bundled_0.1.0-1_amd64.deb) -- DEB
+- [`iderm-0.1.0-3.el10.x86_64.rpm`](https://github.com/1975SG/iderm-packaging/releases/download/v0.1.0/iderm-0.1.0-3.el10.x86_64.rpm) / [`iderm-plugins-bundled-0.1.0-3.el10.noarch.rpm`](https://github.com/1975SG/iderm-packaging/releases/download/v0.1.0/iderm-plugins-bundled-0.1.0-3.el10.noarch.rpm) -- RPM
+- [`iderm-x86_64.AppImage`](https://github.com/1975SG/iderm-packaging/releases/download/v0.1.0/iderm-x86_64.AppImage) -- AppImage, static musl build, runs on any x86_64 Linux
+- [Homebrew formula](packaging/homebrew/) -- `brew install`/`upgrade`/`uninstall` all verified for real on macOS
+
+Verify with the release's `SHA256SUMS`/`SHA256SUMS.asc` (RSA 4096 key `20331E9F5DC14D2F5A6B67ECCFA7A6DB35CD8203`):
+
+```
+gpg --verify SHA256SUMS.asc SHA256SUMS
+sha256sum -c SHA256SUMS
+```
+
 ## What's here
 
 This repository currently hosts packaging (RPM, DEB metadata, Homebrew,
