@@ -43,6 +43,15 @@ separately for now and will be added here once it's ready to go public.
 See `packaging/README.md` for exactly what's real, verified, and still
 open in the packaging story.
 
+## Related repos
+
+- [iderm-plugins](https://github.com/1975SG/iderm-plugins) --
+  maintainer-curated view/repair-recipe plugins
+- [iderm-doctor-rules](https://github.com/1975SG/iderm-doctor-rules) --
+  maintainer-curated doctor-rule plugins
+- [iderm-community-plugins](https://github.com/1975SG/iderm-community-plugins)
+  -- community submissions, automated gate
+
 ## Documentation
 
 - [Quick Start Guide](docs/QSG.md) -- controls and a real walkthrough
