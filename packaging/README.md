@@ -80,12 +80,54 @@ the 2008-dual-Xeon Debian 12 box. Real findings, not hoped-for ones:
   (Make)/README/LICENSE. This is the actual missing piece from the
   extraction-only pass above -- a genuine, complete, root-installed
   verification, not a workaround.
-- `lintian` isn't installed on that box -- that specific quality check
-  is still an open gap, not silently skipped, just not done yet.
+- `lintian` wasn't installed on that box at the time -- root access
+  came later and closed this; see "Lintian: done for real" below.
 
 Built `.deb`s copied back to `deb-build-output/` in this directory for
 reference. Remote scratch state (`~/iderm-deb-test`, `/tmp/deb-extract-*`)
 cleaned up afterward, nothing left on that box.
+
+## Lintian: done for real, 2026-08-23
+
+Root access became available on the real Debian 12 box; `lintian` was
+installed there for real (`sudo apt install lintian`, 2.116.3+deb12u1),
+and both real `.deb`s from `deb-build-output/` were copied over and run
+through it. Real findings, three total, both packages:
+
+```
+E: iderm: embedded-library libyaml [usr/bin/iderm]
+E: iderm: no-changelog usr/share/doc/iderm/changelog.Debian.gz (non-native package)
+W: iderm: no-manual-page [usr/bin/iderm]
+```
+
+(`iderm-plugins-bundled` reports the identical three, since it
+self-contains the full `iderm` binary too -- see the "not RPM-shaped"
+note above.)
+
+- **`embedded-library libyaml`, understood, not actionable the way it
+  reads.** The dependency is `libyaml-rs` -- libyaml transliterated
+  C-to-Rust via `c2rust`, structurally close enough to the real upstream
+  C source that lintian's signature scanner matches it. Confirmed no
+  `.c`/`.h` files and no `build.rs` in the crate -- there is no actual
+  vendored C library here, just Rust source that reads like one. The
+  usual Debian remedy (link against the system's `libyaml.so`, drop the
+  vendored copy) doesn't apply: Rust binaries are statically linked by
+  design, not swappable at the OS-library level. Left open, understood,
+  not a Debian-archive-track security-patching liability the same way a
+  real vendored `.c` copy would be.
+- **`no-changelog`**, real and open. `cargo-deb` didn't generate
+  `changelog.Debian.gz` because no `debian/changelog`-format file was
+  supplied. Core's own `CHANGELOG.md` (Keep a Changelog format) is not
+  directly usable here -- `cargo-deb`'s `changelog` option expects
+  `dpkg-parsechangelog`-compatible syntax, a different format. Left
+  open; would need a real `debian/changelog` maintained alongside it,
+  or a conversion step, to close for real.
+- **`no-manual-page`**, real and open. No `man` page ships for `iderm`.
+  Minor, cosmetic gap; not blocking for a non-archive package.
+
+Scratch copies (`~/iderm_0.1.0-1_amd64.deb`,
+`~/iderm-plugins-bundled_0.1.0-1_amd64.deb`) removed from the box
+afterward, nothing left there.
 
 ## RPM: verified for real (2026-08-22)
 
@@ -299,15 +341,10 @@ generic path in both places it appeared, kept internally consistent.
 - A real tagged release to build the Homebrew formula's `url`/`sha256`
   against -- `head` install only works from a live git checkout, not a
   distributable artifact.
-- `lintian` run against the real `.deb`s -- `rpmlint` is now done (see
-  above); `lintian` genuinely could not be run this session, three real
-  attempts, not one skipped: no Fedora package for this Debian/Ubuntu-
-  specific tool; this session's `podman` couldn't initialize its OCI
-  backend to run it in a Debian container; and the real 2008 dual-Xeon
-  Debian 12 box (the same one DEB itself was verified on) has no root
-  access available at all -- `sudo` there returns "a password is
-  required" with no way to supply one this session. Needs either root
-  on that box or a different Debian/Ubuntu machine with one.
+- `lintian`'s two real open findings: no `debian/changelog`-format
+  changelog (so no `changelog.Debian.gz`), and no `man` page for
+  `iderm`. See the "Lintian: done for real" section above -- the tool
+  itself is no longer blocked, `rpmlint` and `lintian` are both done.
 - AppImage's bundled-plugins variant (see above).
 - A final icon set from a real designer -- the current icon is the
   user's real logo (see above), not a generated placeholder anymore,

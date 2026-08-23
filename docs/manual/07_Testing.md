@@ -91,6 +91,14 @@ refused the proposal and did not create the target file.
   all five. `release/SHA256SUMS.asc`, a detached signature over that
   file with the same key, verified with `gpg --verify`. Record:
   `signing/README.md`, `release/RELEASE-MANIFEST.md`.
+- **`lintian` run against real `.deb` artifacts, 2026-08-23.** Root
+  access became available on the real Debian 12 box; `lintian` 2.116.3
+  installed and run against both real `.deb`s. Three real findings:
+  `embedded-library libyaml` (a c2rust transliteration, not a true
+  vendored C library -- understood, not actionable), `no-changelog`
+  (no `debian/changelog`-format file supplied to `cargo-deb`), and
+  `no-manual-page`. The latter two remain open. Record:
+  `packaging/README.md`, "Lintian: done for real" section.
 - **Current third-party dependency license report, 2026-08-22.** A
   real `cargo license` run (`release/dependency-licenses.txt`) and a
   real CycloneDX 1.5 software bill of materials, 343 components
