@@ -72,9 +72,29 @@ refused the proposal and did not create the target file.
 - **RPM install and run, 2026-08-22.** A real `.rpm` installed via
   `sudo rpm -i` on a clean RHEL box; the installed binary ran against
   a real project with real USB hardware attached. Record:
-  `packaging/README.md`, RPM section. **Update and removal are not yet
-  recorded** -- `rpm -U`/`rpm -e` against a prior install have not been
-  exercised. Remains open.
+  `packaging/README.md`, RPM section.
+- **RPM update and removal, 2026-08-23.** A real `rpm -U` from
+  `0.1.0-1` to `0.1.0-2` on a real RHEL 10.2 box, both packages,
+  verified via `rpm -q`, `iderm --version`, and `man iderm` after the
+  upgrade. A real `rpm -e` of both packages afterward found a real
+  bug: three directories (`%{_docdir}/%{name}`, `%{_licensedir}/
+  %{name}`, `%{_datadir}/iderm` and its `plugins/` subdirectory) were
+  left behind, empty, because `install -D` to an absolute path plus a
+  `%doc`/`%license` reference to that same path doesn't give RPM
+  ownership of the containing directory the way the bare-filename
+  shorthand does. Fixed with explicit `%dir` entries, `0.1.0-3`; a
+  second real install-then-remove cycle confirmed all three
+  directories are actually gone afterward. RHEL's own `rust`/
+  `rust-toolset` packages currently cap at 1.92.0, which cannot build
+  Core's pinned `wasmtime` 47.0.3 (needs 1.94.0+) -- a real attempt to
+  downgrade wasmtime to a 1.92.0-compatible version (44.0.3) was
+  reverted after `cargo deny` showed it reintroduces two disclosed
+  WASI-sandbox CVEs (`RUSTSEC-2026-0188` and one other), fixed only at
+  46.0.2+/47.0.3. This build used `rustup`'s newer toolchain with
+  `rpmbuild --nodeps` instead, as a test-only exception -- RHEL's
+  distro-toolchain build path for the current, patched source stays
+  genuinely blocked until Red Hat ships a newer `rust` package.
+  Record: `packaging/README.md`, RPM section.
 - **Homebrew install and run, 2026-08-22.** A real
   `brew install --build-from-source --HEAD` on a clean macOS box; the
   installed binary ran a self-scan against its own repository and a

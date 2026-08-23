@@ -222,6 +222,52 @@ box, no dev tools pre-installed. Real findings, not hoped-for ones:
     correctly gzip-compressed, Fedora's own real convention; two
     `spelling-error` hits are the checker not knowing "pre-built"/"EMC").
 
+## RPM update + removal: verified for real (2026-08-23)
+
+P1 developed problems; this pass ran on a real successor RHEL 10.2 box
+with the same prior `iderm-0.1.0-1` install already on it.
+
+- **Real, hard MSRV blocker found first.** Core's pinned `wasmtime`
+  47.0.3 needs rustc 1.94.0+; RHEL 10.2's own `rust` and
+  `rust-toolset` packages both cap at 1.92.0 in the real repos --
+  confirmed via `dnf list --showduplicates`, no newer version
+  available at all. A real attempt to downgrade wasmtime to 44.0.3
+  (the newest release still requiring only 1.92.0) was tried, built
+  clean, and passed all 201 tests locally -- but `cargo deny check`
+  showed it reintroduces two disclosed WASI-sandbox CVEs
+  (`RUSTSEC-2026-0188` and one other), both fixed only at
+  46.0.2+/47.0.3. **Reverted immediately, not shipped.** RHEL 10.2's
+  distro-toolchain build path is genuinely blocked for the current,
+  security-patched source until Red Hat ships a newer `rust` package
+  -- this is a real, open constraint, not something to work around by
+  weakening the sandbox. Today's actual update/removal test used
+  `rustup`'s newer toolchain (already on the box) with `rpmbuild
+  --nodeps`, a test-only exception, same spirit as the earlier
+  lint-only local build.
+- **Real upgrade test**: bumped the spec to `0.1.0-2` (release bump
+  only, no source change, purely to give `rpm -U` something real to
+  upgrade over), built, `sudo rpm -U` over the existing `0.1.0-1`.
+  `rpm -q`, `iderm --version`, and `man iderm` all confirmed the
+  upgrade landed correctly. Also fresh-installed
+  `iderm-plugins-bundled-0.1.0-2` (wasn't previously installed) to
+  exercise its exact-version `Requires: iderm = %{version}-%{release}`
+  against the just-upgraded base package -- installed clean, all 6
+  `.wasm` files present.
+- **Real removal test, real bug found**: `sudo rpm -e
+  iderm-plugins-bundled iderm` reported success and `rpm -q` correctly
+  showed both gone -- but three directories were left behind, empty:
+  `%{_docdir}/%{name}`, `%{_licensedir}/%{name}`, and
+  `%{_datadir}/iderm` (with its `plugins/` subdirectory). Cause: the
+  spec's `%install` uses `install -D` to absolute paths, then
+  references those same absolute paths in `%files` with `%doc`/
+  `%license` -- that combination doesn't give RPM ownership of the
+  containing directory the way the bare-filename `%doc README.md`
+  shorthand does. Fixed with explicit `%dir` entries for all three,
+  bumped to `0.1.0-3`. **Re-verified with a second full install
+  (`rpm -U`, both packages) then removal (`rpm -e`) cycle**: all three
+  directories confirmed actually gone afterward, not just assumed
+  fixed from reading the spec.
+
 ## Homebrew: verified for real (2026-08-22)
 
 Tested on real hardware, not assumed: `brew install --build-from-source
@@ -389,6 +435,14 @@ generic path in both places it appeared, kept internally consistent.
   but a proper multi-size icon set is still expected later.
 - AppImage tested only on this dev machine so far -- not yet run on a
   separate, clean box the way DEB/RPM/Homebrew each were.
+- **RHEL's distro-toolchain RPM build path is genuinely blocked**,
+  real finding 2026-08-23: RHEL 10.2's `rust`/`rust-toolset` packages
+  cap at 1.92.0, Core's pinned `wasmtime` needs 1.94.0+, and
+  downgrading wasmtime to a 1.92.0-compatible version reintroduces two
+  disclosed WASI-sandbox CVEs (see "RPM update + removal" above) --
+  not an acceptable trade. Stays open until Red Hat ships a newer
+  `rust` package; `rustup` + `rpmbuild --nodeps` remains a real but
+  unsupported workaround for local testing only.
 
 ## How to apply
 
