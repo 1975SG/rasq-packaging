@@ -11,8 +11,8 @@ cd "$(dirname "$0")/.."
 ARTIFACTS="
 packaging/deb-build-output/iderm_0.1.0-1_amd64.deb
 packaging/deb-build-output/iderm-plugins-bundled_0.1.0-1_amd64.deb
-packaging/rpm-build-output/iderm-0.1.0-1.fc43.x86_64.rpm
-packaging/rpm-build-output/iderm-plugins-bundled-0.1.0-1.fc43.noarch.rpm
+packaging/rpm-build-output/iderm-0.1.0-3.el10.x86_64.rpm
+packaging/rpm-build-output/iderm-plugins-bundled-0.1.0-3.el10.noarch.rpm
 packaging/appimage-build-output/iderm-x86_64.AppImage
 "
 
