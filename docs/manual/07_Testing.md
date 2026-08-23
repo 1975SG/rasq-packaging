@@ -116,6 +116,19 @@ refused the proposal and did not create the target file.
   warnings about leftover shared `openssl@3`/`ca-certificates` config
   files, unrelated to `iderm`'s own files. Record: `packaging/README.md`,
   Homebrew section.
+- **AppImage real glibc portability bug, found and fixed 2026-08-23.**
+  The 22 Aug AppImage, tested only on the build machine, failed on
+  every separate box it reached: silently on Zorin (no visible error
+  from a double-click launch), with a clear
+  `GLIBC_2.39' not found` linker error on a real Debian 12 box. Root
+  cause: dynamically linked against the build machine's own
+  bleeding-edge glibc (2.42), too new for either target. Fixed by
+  rebuilding statically against musl -- `ldd` confirms "not a dynamic
+  executable", zero runtime dependency at all. Re-tested clean on the
+  same Debian 12 box (`--version`, a real `scan --format=json`).
+  Core's `packaging/appimage/build.sh` updated to build from the musl
+  target permanently. Record: `packaging/README.md`, "AppImage: real
+  glibc portability bug found and fixed" section.
 - **Signed artifact and checksum verification, 2026-08-22.** A real
   GPG key (RSA 4096, fingerprint
   `20331E9F5DC14D2F5A6B67ECCFA7A6DB35CD8203`) signed both local RPM

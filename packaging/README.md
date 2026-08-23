@@ -370,6 +370,44 @@ assembly + `appimagetool` invocation.
   to the AppDir the same way DEB's self-contained variant works, just
   not done in this pass.
 
+## AppImage: real glibc portability bug found and fixed (2026-08-23)
+
+**Real finding, from the user's own testing.** The 22 Aug AppImage was
+tested only on the build machine itself, never a separate box -- once
+tried on Zorin, it did nothing at all: no window, no visible error,
+nothing. Copied to a real Debian 12 box and run directly from a
+terminal for a clearer signal:
+
+```
+/lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.39' not found (required by iderm-x86_64.AppImage)
+```
+
+**Root cause, confirmed not assumed.** The AppImage's binary was
+dynamically linked against the build machine's glibc (2.42, a
+bleeding-edge Fedora release) -- so it only runs on hosts with a glibc
+new enough to satisfy every symbol version linked against. Debian 12
+ships 2.36, real Ubuntu-based distros like Zorin ship comparably old
+versions -- both too old. On Debian, running from a real terminal
+surfaced a clear dynamic-linker error; on Zorin, double-clicking an
+AppImage from a file manager has no terminal to show that same error
+in, so the exact same failure just looked like nothing happening.
+AppImage has no dependency-version check the way DEB/RPM's
+`Requires: libc6 (>= 2.34)` does -- it just fails silently at the
+dynamic linker.
+
+**Real fix**: rebuilt statically against musl
+(`x86_64-unknown-linux-musl` target, `musl-gcc` for the project's C
+dependencies) instead of the default glibc target, with the same
+path-remap discipline as every other rebuild this session. Confirmed
+`ldd` reports "not a dynamic executable" -- zero runtime dependency
+of any kind, not just a newer glibc target. `packaging/appimage/
+build.sh` (Core) updated to build from the musl target permanently,
+not a one-off manual substitution. Real-tested on the same Debian 12
+box that rejected the old build: `--version` correct, a real
+`scan --format=json` against a live project produced valid output.
+`release/SHA256SUMS`/`RELEASE-MANIFEST.md`/`SHA256SUMS.asc`
+regenerated to match the new artifact.
+
 ## `cargo deny`: verified for real (2026-08-22)
 
 `cargo-deny` installed and `cargo deny check` run for real against the
@@ -467,8 +505,12 @@ generic path in both places it appeared, kept internally consistent.
 - A final icon set from a real designer -- the current icon is the
   user's real logo (see above), not a generated placeholder anymore,
   but a proper multi-size icon set is still expected later.
-- AppImage tested only on this dev machine so far -- not yet run on a
-  separate, clean box the way DEB/RPM/Homebrew each were.
+- **AppImage now real-tested on a separate box, 23 Aug** -- the musl
+  rebuild ran clean on a real Debian 12 box (see "real glibc
+  portability bug found and fixed" above). Zorin -- the box that
+  first reported the old build "did nothing" -- hasn't been re-tested
+  with this fixed build yet; the original failure was against the old
+  glibc-linked build, not this one.
 - **RHEL's distro-toolchain RPM build path is genuinely blocked**,
   real finding 2026-08-23: RHEL 10.2's `rust`/`rust-toolset` packages
   cap at 1.92.0, Core's pinned `wasmtime` needs 1.94.0+, and
