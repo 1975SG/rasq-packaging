@@ -115,18 +115,44 @@ note above.)
   design, not swappable at the OS-library level. Left open, understood,
   not a Debian-archive-track security-patching liability the same way a
   real vendored `.c` copy would be.
-- **`no-changelog`**, real and open. `cargo-deb` didn't generate
-  `changelog.Debian.gz` because no `debian/changelog`-format file was
-  supplied. Core's own `CHANGELOG.md` (Keep a Changelog format) is not
-  directly usable here -- `cargo-deb`'s `changelog` option expects
-  `dpkg-parsechangelog`-compatible syntax, a different format. Left
-  open; would need a real `debian/changelog` maintained alongside it,
-  or a conversion step, to close for real.
+- **`no-changelog`, fixed for real, same day.** `cargo-deb` didn't
+  generate `changelog.Debian.gz` because no `debian/changelog`-format
+  file was supplied -- Core's own `CHANGELOG.md` (Keep a Changelog
+  format) isn't directly usable here, `cargo-deb`'s `changelog` option
+  expects real `dpkg-parsechangelog`-compatible syntax, a different
+  format. Added a real `debian/changelog` to Core (single `0.1.0-1`
+  "Initial release." entry, validated with the real
+  `dpkg-parsechangelog` on the same Debian 12 box, exit 0) and pointed
+  `[package.metadata.deb]`'s `changelog` key at it. Rebuilt both
+  `.deb` variants for real on that box (`cargo build --release`,
+  4m18s; `cargo deb --no-build`, both base and `--variant
+  plugins-bundled`) and re-ran `lintian`: the `E: no-changelog`
+  finding is gone on both packages, replaced only by a minor `W:
+  initial-upload-closes-no-bugs` (an archive-upload-specific note, not
+  applicable -- this isn't going into the real Debian archive). **Real
+  leak caught before either `.deb` left the build box**: the first
+  rebuild used a plain `cargo build --release`, no path-remap flag --
+  `strings` on the resulting binary found 671 real instances of the
+  Debian box's actual home directory path (via Rust's default
+  panic-location strings) plus 7 more via `tree-sitter`'s bundled C
+  sources (`--remap-path-prefix` is a `rustc`-only flag, doesn't touch
+  `cc`-compiled object files). Fixed with both
+  `RUSTFLAGS="--remap-path-prefix=<real-path>=~"` and
+  `CFLAGS="-ffile-prefix-map=<real-path>=~"` set together, full clean
+  rebuild (4m19s), re-verified zero leaks on the box and independently
+  re-checked on a second machine too, not just trusted the remote
+  result. Same class of finding as the earlier bundled-plugin `.wasm`
+  leak (see above) -- confirms this needs to be standard practice for
+  any from-source rebuild on a new machine, not a one-off.
+  `release/SHA256SUMS`, `RELEASE-MANIFEST.md`, and `SHA256SUMS.asc`
+  regenerated and re-signed to match the rebuilt, clean `.deb`s' new
+  bytes.
 - **`no-manual-page`**, real and open. No `man` page ships for `iderm`.
   Minor, cosmetic gap; not blocking for a non-archive package.
 
 Scratch copies (`~/iderm_0.1.0-1_amd64.deb`,
-`~/iderm-plugins-bundled_0.1.0-1_amd64.deb`) removed from the box
+`~/iderm-plugins-bundled_0.1.0-1_amd64.deb`,
+`~/iderm-changelog-test/`) removed from the box
 afterward, nothing left there.
 
 ## RPM: verified for real (2026-08-22)
@@ -341,10 +367,11 @@ generic path in both places it appeared, kept internally consistent.
 - A real tagged release to build the Homebrew formula's `url`/`sha256`
   against -- `head` install only works from a live git checkout, not a
   distributable artifact.
-- `lintian`'s two real open findings: no `debian/changelog`-format
-  changelog (so no `changelog.Debian.gz`), and no `man` page for
-  `iderm`. See the "Lintian: done for real" section above -- the tool
-  itself is no longer blocked, `rpmlint` and `lintian` are both done.
+- `lintian`'s one remaining real open finding: no `man` page for
+  `iderm`'s DEB packaging (the `no-changelog` finding is fixed, see
+  the "Lintian: done for real" section above). `rpmlint` and `lintian`
+  are both done as tools -- this is packaging content, not a blocked
+  check.
 - AppImage's bundled-plugins variant (see above).
 - A final icon set from a real designer -- the current icon is the
   user's real logo (see above), not a generated placeholder anymore,
