@@ -12,8 +12,8 @@ This clause records deliberate product boundaries. Each boundary follows an
 existing project commitment. It is not an arbitrary feature cut.
 
 A proposal that reintroduces one of these items shall first identify and amend
-the conflicting commitment in the QSG, `docs/reference/Architecture_Compact.md`, README, or the
-applicable architecture decision.
+the conflicting commitment in the QSG, README, or the applicable architecture
+decision.
 
 ## 12.2 Telemetry
 
@@ -48,7 +48,7 @@ A large, central, mandatory configuration system is not planned.
 
 Reason:
 
-- `docs/reference/Architecture_Compact.md` (Config section) defines small project-local `.iderm/*.toml` files;
+- Core's own architecture defines small project-local `.iderm/*.toml` files;
 - each file is additive;
 - absence degrades to no extension; and
 - the base operating loop remains valid with no `.iderm/` directory.

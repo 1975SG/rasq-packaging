@@ -490,14 +490,6 @@ inspect it, then remove it if you want the project-local integration gone.
 | need | document |
 |---|---|
 | complete manual | `docs/manual/index.md` |
-| architecture, modules, headless interface, config, doctor, plugin ABI, rendering, AI adapter | `docs/reference/Architecture_Compact.md` |
-| decisions + current behavior | `docs/reference/Decisions_Compact.md` |
-| roadmap + what's not planned | `docs/reference/Roadmap_Compact.md` |
-| security posture + real verification results | `docs/reference/Security_Reports_Compact.md` |
-| project vision | `docs/reference/Vision_Compact.md` |
-| workbench guides | `docs/reference/Plugin_Guides_And_Misc_Compact.md` |
-
-Every entry above is a compact index, not the full prose original -- Core's
-full-detail docs live in Core's own repository.
+| man page | `docs/man/iderm.1` |
 
 IDERM is dual-licensed under MIT or Apache-2.0, at your option.

@@ -168,5 +168,4 @@ refused the proposal and did not create the target file.
   One real, exploitable sandbox-boundary finding (a path-traversal
   escape in a host-facing plugin function), fixed the same day; two
   Low findings, addressed. Zero hand-written `unsafe` code in scope;
-  zero dependency CVEs. Record: `docs/reference/Security_Reports_Compact.md`
-  (full report in Core's own repository).
+  zero dependency CVEs. Full report in Core's own repository.

@@ -45,21 +45,18 @@ open in the packaging story.
 
 ## Related repos
 
-- [iderm-plugins](https://github.com/1975SG/iderm-plugins) --
+- [rasq-plugins](https://github.com/1975SG/rasq-plugins) --
   maintainer-curated view/repair-recipe plugins
-- [iderm-doctor-rules](https://github.com/1975SG/iderm-doctor-rules) --
+- [rasq-doctor-rules](https://github.com/1975SG/rasq-doctor-rules) --
   maintainer-curated doctor-rule plugins
-- [iderm-community-plugins](https://github.com/1975SG/iderm-community-plugins)
+- [rasq-community-plugins](https://github.com/1975SG/rasq-community-plugins)
   -- community submissions, automated gate
 
 ## Documentation
 
 - [Quick Start Guide](docs/QSG.md) -- controls and a real walkthrough
 - [User manual](docs/manual/index.md) -- full detail
-- [`docs/reference/`](docs/reference/) -- compact indexes: architecture,
-  decisions, roadmap, security + real verification results, project
-  vision, and the plugin/workbench guides. Each one links back to where
-  its full-detail original lives once Core's own repository is public.
+- [Man page](docs/man/iderm.1)
 
 ## Packaging status
 
